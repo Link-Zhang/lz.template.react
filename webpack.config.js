@@ -3,10 +3,12 @@ const webpack = require("webpack");
 const htmlWebpackPlugin = require("html-webpack-plugin");
 const cleanWebpackPlugin = require("clean-webpack-plugin");
 const miniCssExtractPlugin = require("mini-css-extract-plugin");
+const copyWebpackPlugin = require('copy-webpack-plugin');
+
 const devMode = process.env.NODE_ENV === "production";
 
 module.exports = {
-    devtool: devMode ? "none" : "eval",
+    devtool: devMode ? "source-map" : "source-map",
     devServer: {
         contentBase: path.join(__dirname, "dist"),
         host: "0.0.0.0",
@@ -17,8 +19,8 @@ module.exports = {
     },
     entry: path.resolve(__dirname, "src") + "/index.js",
     output: {
-        path: path.resolve(__dirname, "dist"),
-        filename: devMode ? "bundle.min.js" : "bundle.js",
+        path: path.resolve(__dirname, "dist/"),
+        filename: devMode ? "static/js/bundle.min.js" : "static/js/bundle.js",
     },
     module: {
         rules: [
@@ -32,7 +34,8 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    miniCssExtractPlugin.loader,
+                    // devMode ? "style-loader" : miniCssExtractPlugin.loader,
                     {
                         loader: "css-loader",
                         options: {
@@ -48,7 +51,8 @@ module.exports = {
             {
                 test: /\.less$/,
                 use: [
-                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    miniCssExtractPlugin.loader,
+                    // devMode ? "style-loader" : miniCssExtractPlugin.loader,
                     {
                         loader: "css-loader"
                     },
@@ -60,7 +64,8 @@ module.exports = {
             {
                 test: /\.scss$/,
                 use: [
-                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    miniCssExtractPlugin.loader,
+                    // devMode ? "style-loader" : miniCssExtractPlugin.loader,
                     {
                         loader: "css-loader"
                     },
@@ -73,13 +78,20 @@ module.exports = {
                 test: /\.(png|jpg|jpeg|gif|svg)$/,
                 loader: 'file-loader',
                 options: {
-                    name: devMode ? "[sha512:hash:hex:8].[ext]" : "[path][name].[ext]"
+                    name: devMode ? "static/media/[sha512:hash:hex:8].[ext]" : "static/media/[name].[ext]"
                 }
             }
         ]
     },
     plugins: [
         new cleanWebpackPlugin(['dist']),
+        new miniCssExtractPlugin({
+            filename: devMode ? "static/css/bundle.min.css" : "static/css/bundle.css",
+            chunkFilename: devMode ? "static/css/[id].css" : "static/css/[id].[hash].css",
+        }),
+        new copyWebpackPlugin([
+            {from: "public"}
+        ]),
         new htmlWebpackPlugin({
             template: "src/index.html"
         })
@@ -91,8 +103,4 @@ if (devMode) {
 } else {
     module.exports.mode = "development";
     module.exports.plugins.push(new webpack.HotModuleReplacementPlugin());
-    module.exports.plugins.push(new miniCssExtractPlugin({
-        filename: devMode ? "bundle.min.css" : "bundle.css",
-        chunkFilename: devMode ? "[id].css" : "[id].[hash].css",
-    }));
 }
