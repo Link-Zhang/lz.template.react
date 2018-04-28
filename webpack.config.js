@@ -1,0 +1,98 @@
+const path = require("path");
+const webpack = require("webpack");
+const htmlWebpackPlugin = require("html-webpack-plugin");
+const cleanWebpackPlugin = require("clean-webpack-plugin");
+const miniCssExtractPlugin = require("mini-css-extract-plugin");
+const devMode = process.env.NODE_ENV === "production";
+
+module.exports = {
+    devtool: devMode ? "none" : "eval",
+    devServer: {
+        contentBase: path.join(__dirname, "dist"),
+        host: "0.0.0.0",
+        port: 4000,
+        inline: true,
+        hot: true,
+        open: true
+    },
+    entry: path.resolve(__dirname, "src") + "/index.js",
+    output: {
+        path: path.resolve(__dirname, "dist"),
+        filename: devMode ? "bundle.min.js" : "bundle.js",
+    },
+    module: {
+        rules: [
+            {
+                test: /(\.jsx?)$/,
+                use: {
+                    loader: "babel-loader",
+                },
+                exclude: /node_modules/
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                        options: {
+                            modules: true,
+                            localIdentName: "[name].[hash:base64:8]"
+                        }
+                    },
+                    {
+                        loader: "postcss-loader"
+                    }
+                ]
+            },
+            {
+                test: /\.less$/,
+                use: [
+                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader"
+                    },
+                    {
+                        loader: "less-loader"
+                    }
+                ]
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader"
+                    },
+                    {
+                        loader: "sass-loader"
+                    }
+                ]
+            },
+            {
+                test: /\.(png|jpg|jpeg|gif|svg)$/,
+                loader: 'file-loader',
+                options: {
+                    name: devMode ? "[sha512:hash:hex:8].[ext]" : "[path][name].[ext]"
+                }
+            }
+        ]
+    },
+    plugins: [
+        new cleanWebpackPlugin(['dist']),
+        new htmlWebpackPlugin({
+            template: "src/index.html"
+        })
+    ]
+};
+
+if (devMode) {
+    module.exports.mode = "production";
+} else {
+    module.exports.mode = "development";
+    module.exports.plugins.push(new webpack.HotModuleReplacementPlugin());
+    module.exports.plugins.push(new miniCssExtractPlugin({
+        filename: devMode ? "bundle.min.css" : "bundle.css",
+        chunkFilename: devMode ? "[id].css" : "[id].[hash].css",
+    }));
+}
