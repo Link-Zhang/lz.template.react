@@ -8,7 +8,7 @@ const copyWebpackPlugin = require('copy-webpack-plugin');
 const devMode = process.env.NODE_ENV === "production";
 
 module.exports = {
-    devtool: devMode ? "source-map" : "source-map",
+    devtool: devMode ? "none" : "source-map",
     devServer: {
         contentBase: path.join(__dirname, "dist"),
         host: "0.0.0.0",
@@ -34,8 +34,7 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    miniCssExtractPlugin.loader,
-                    // devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
                     {
                         loader: "css-loader",
                         options: {
@@ -51,8 +50,7 @@ module.exports = {
             {
                 test: /\.less$/,
                 use: [
-                    miniCssExtractPlugin.loader,
-                    // devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
                     {
                         loader: "css-loader"
                     },
@@ -64,8 +62,7 @@ module.exports = {
             {
                 test: /\.scss$/,
                 use: [
-                    miniCssExtractPlugin.loader,
-                    // devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
                     {
                         loader: "css-loader"
                     },
