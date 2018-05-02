@@ -1,15 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
-import css from './index.css';
-import Greeter from './Greeter';
+import Menu from './Menu';
+import data from './data';
+
+window.React = React;
 
 ReactDOM.render(
-    <div className={css.index}><h1>Hello, React!</h1></div>,
-    document.getElementById('root')
+    <Menu recipes={data}/>,
+    document.getElementById("react-container")
 );
-ReactDOM.render(<App/>, document.getElementById('app'));
-ReactDOM.render(<Greeter/>, document.getElementById('greeter'));
 
 if (module.hot) {
     module.hot.accept();
