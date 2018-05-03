@@ -1,14 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import Menu from './Menu';
-import data from './data';
+import {render} from 'react-dom';
+import App from './color/App'
 
 window.React = React;
 
-ReactDOM.render(
-    <Menu recipes={data}/>,
-    document.getElementById("react-container")
-);
+render(<App/>, document.getElementById('react-container'));
 
 if (module.hot) {
     module.hot.accept();
