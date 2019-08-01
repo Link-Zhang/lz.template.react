@@ -1,9 +1,9 @@
 const path = require("path");
 const webpack = require("webpack");
-const htmlWebpackPlugin = require("html-webpack-plugin");
-const cleanWebpackPlugin = require("clean-webpack-plugin");
-const miniCssExtractPlugin = require("mini-css-extract-plugin");
-const copyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyPlugin = require('copy-webpack-plugin');
 
 const devMode = process.env.NODE_ENV === "production";
 
@@ -25,16 +25,19 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /(\.jsx?)$/,
+                test: /\.jsx?$/,
+                exclude: /node_modules/,
                 use: {
                     loader: "babel-loader",
+                    options: {
+                        "presets": ["env"]
+                    }
                 },
-                exclude: /node_modules/
             },
             {
                 test: /\.css$/,
                 use: [
-                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    devMode ? "style-loader" : MiniCssExtractPlugin.loader,
                     {
                         loader: "css-loader",
                         options: {
@@ -49,7 +52,7 @@ module.exports = {
             {
                 test: /\.less$/,
                 use: [
-                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    devMode ? "style-loader" : MiniCssExtractPlugin.loader,
                     {
                         loader: "css-loader"
                     },
@@ -61,7 +64,7 @@ module.exports = {
             {
                 test: /\.scss$/,
                 use: [
-                    devMode ? "style-loader" : miniCssExtractPlugin.loader,
+                    devMode ? "style-loader" : MiniCssExtractPlugin.loader,
                     {
                         loader: "css-loader"
                     },
@@ -79,16 +82,20 @@ module.exports = {
             }
         ]
     },
+    resolve: {
+        extensions: ['.js', '.jsx'],
+    },
     plugins: [
-        new cleanWebpackPlugin(['dist']),
-        new miniCssExtractPlugin({
+        new CleanWebpackPlugin(),
+        new MiniCssExtractPlugin({
             filename: devMode ? "static/css/bundle.min.css" : "static/css/bundle.css",
             chunkFilename: devMode ? "static/css/[id].css" : "static/css/[id].[hash].css",
+            ignoreOrder: false,
         }),
-        new copyWebpackPlugin([
+        new CopyPlugin([
             {from: "public"}
         ]),
-        new htmlWebpackPlugin({
+        new HtmlWebpackPlugin({
             template: "src/index.html"
         })
     ]
