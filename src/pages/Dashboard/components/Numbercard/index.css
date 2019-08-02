@@ -1,0 +1,34 @@
+.numberCard {
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.numberCardIconWarp {
+    font-size: 54px;
+    float: left;
+}
+
+.numberCardContent {
+    width: 100%;
+    padding-left: 78px;
+}
+
+.numberCardTitle {
+    line-height: 16px;
+    font-size: 16px;
+    margin-bottom: 8px;
+    height: 16px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.numberCardNumber {
+    line-height: 32px;
+    font-size: 32px;
+    height: 32px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-bottom: 0;
+}

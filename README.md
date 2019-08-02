@@ -1,6 +1,6 @@
 # lz.template.react
-Link Zhang Template React
+Link Zhang React Home Project Based On Webpack and Babel not Create-React-App
 Use :
-* Yarn 1.9.4
+* Yarn 1.16.0
 * Webpack 4
 * Babel 6

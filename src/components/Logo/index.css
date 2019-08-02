@@ -1,0 +1,20 @@
+.ant-layout-logo-normal {
+    margin: 16px 8px 16px 12px;
+    height: 32px;
+    background: #333;
+    border-radius: 6px;
+}
+
+.ant-layout-logo-collapse {
+    margin: 16px;
+    transition: all 0.3s ease;
+    height: 32px;
+    background: #333;
+    border-radius: 6px;
+}
+
+.ant-layout-logo-text {
+    text-align: center;
+    font-family: Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimSun, sans-serif;
+    font-size: 22px;
+}

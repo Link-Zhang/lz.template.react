@@ -3,15 +3,17 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyPlugin = require('copy-webpack-plugin');
+const OptimizeCSSAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsWebpackPlugin = require("uglifyjs-webpack-plugin");
 
-const devMode = process.env.NODE_ENV === "production";
+const devMode = process.env.NODE_ENV === "development";
 
 module.exports = {
-    devtool: devMode ? "none" : "source-map",
+    devtool: devMode ? "source-map" : "none",
     devServer: {
         contentBase: path.join(__dirname, "dist"),
-        host: "0.0.0.0",
+        host: "localhost",
         port: 4000,
         inline: true,
         hot: true,
@@ -20,7 +22,7 @@ module.exports = {
     entry: path.resolve(__dirname, "src") + "/index.js",
     output: {
         path: path.resolve(__dirname, "dist/"),
-        filename: devMode ? "static/js/bundle.min.js" : "static/js/bundle.js",
+        filename: devMode ? "static/js/bundle.js" : "static/js/bundle.min.js",
     },
     module: {
         rules: [
@@ -30,7 +32,19 @@ module.exports = {
                 use: {
                     loader: "babel-loader",
                     options: {
-                        "presets": ["env"]
+                        presets: [
+                            "env",
+                            "stage-0",
+                            "react"
+                        ],
+                        plugins: [
+                            ["import", {
+                                "libraryName": "antd",
+                                "libraryDirectory": "es",
+                                "style": "css"
+                            }],
+                            "transform-runtime"
+                        ],
                     }
                 },
             },
@@ -38,39 +52,19 @@ module.exports = {
                 test: /\.css$/,
                 use: [
                     devMode ? "style-loader" : MiniCssExtractPlugin.loader,
-                    {
-                        loader: "css-loader",
-                        options: {
-                            localIdentName: "[name].[hash:base64:8]"
-                        }
-                    },
-                    {
-                        loader: "postcss-loader"
-                    }
-                ]
+                    "css-loader",
+                ],
             },
             {
                 test: /\.less$/,
                 use: [
-                    devMode ? "style-loader" : MiniCssExtractPlugin.loader,
-                    {
-                        loader: "css-loader"
-                    },
-                    {
-                        loader: "less-loader"
-                    }
+                    devMode ? "style-loader" : MiniCssExtractPlugin.loader, "css-loader", "less-loader",
                 ]
             },
             {
                 test: /\.scss$/,
                 use: [
-                    devMode ? "style-loader" : MiniCssExtractPlugin.loader,
-                    {
-                        loader: "css-loader"
-                    },
-                    {
-                        loader: "sass-loader"
-                    }
+                    devMode ? "style-loader" : MiniCssExtractPlugin.loader, "css-loader", "sass-loader",
                 ]
             },
             {
@@ -85,25 +79,47 @@ module.exports = {
     resolve: {
         extensions: ['.js', '.jsx'],
     },
+    optimization: {
+        minimizer: [new UglifyJsWebpackPlugin({
+            parallel: true,
+        })],
+    },
     plugins: [
         new CleanWebpackPlugin(),
-        new MiniCssExtractPlugin({
-            filename: devMode ? "static/css/bundle.min.css" : "static/css/bundle.css",
-            chunkFilename: devMode ? "static/css/[id].css" : "static/css/[id].[hash].css",
-            ignoreOrder: false,
+        new OptimizeCSSAssetsWebpackPlugin({
+            assetNameRegExp: /\.css$/g,
+            cssProcessor: require("cssnano"),
+            cssProcessorPluginOptions: {
+                preset: ["default", {discardComments: {removeAll: true}}],
+            },
+            canPrint: true
         }),
-        new CopyPlugin([
+        new MiniCssExtractPlugin({
+            filename: devMode ? "static/css/bundle.css" : "static/css/bundle.min.css",
+            chunkFilename: devMode ? "static/css/[id].css" : "static/css/[id].min.css",
+            ignoreOrder: true,
+        }),
+        new CopyWebpackPlugin([
             {from: "public"}
         ]),
         new HtmlWebpackPlugin({
+            minify: {
+                collapseWhitespace: true,
+                removeComments: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                useShortDoctype: true
+            },
+            hash: true,
             template: "src/index.html"
         })
     ]
 };
 
 if (devMode) {
-    module.exports.mode = "production";
-} else {
     module.exports.mode = "development";
     module.exports.plugins.push(new webpack.HotModuleReplacementPlugin());
+} else {
+    module.exports.mode = "production";
 }
